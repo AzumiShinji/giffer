@@ -1,0 +1,5 @@
+{
+    "require": {
+        "stil/gif-endec": "^0.2.0"
+    }
+}
