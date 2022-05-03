@@ -14,7 +14,7 @@ giffer [OPTIONS] SRC_FILE DEST_FILE
         DEST_FILE - путь к выходному файлу (строка)
         
         Пример:
-        giffer --width=640 --height=480 --mark=\"C:\\mark.png\" \"C:\\orig.gif\" \"C:\\result.gif\"
+        giffer --width=640 --height=480 --mark="C:\mark.png" "C:\orig.gif" "C:\result.gif"
 ```
 
 В виде водяного знака принимаются изображения в форматах png, jpg, bmp, gif.
