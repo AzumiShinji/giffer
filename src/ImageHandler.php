@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Устанавливаем зависимости библиотек
@@ -63,7 +63,6 @@ class ImageHandler
     {
         $this->imgPath = $path;
         $this->tmpDir = $tmpDir;
-        
     }
 
     /**
@@ -73,7 +72,9 @@ class ImageHandler
     {
         // Очищаем дирректорию от файлов
         array_map('unlink', glob($this->tmpDir . "*"));
-        if(!rmdir($this->tmpDir)) throw new Exception("Ошибка. Код -1. Ошибка удаления временной директории.");
+        if (!rmdir($this->tmpDir)) {
+            throw new Exception("Ошибка. Код -1. Ошибка удаления временной директории.");
+        }
     }
 
     /**
@@ -85,7 +86,9 @@ class ImageHandler
         $gifDecoder = new Decoder($gifStream);
         $gifRenderer = new Renderer($gifDecoder);
 
-        if (!mkdir($this->tmpDir)) throw new Exception("Ошибка. Код -1. Ошибка создания временного хранилища кадров.");
+        if (!mkdir($this->tmpDir)) {
+            throw new Exception("Ошибка. Код -1. Ошибка создания временного хранилища кадров.");
+        }
 
         $gifRenderer->start(function (FrameRenderedEvent $event) {
 
@@ -102,7 +105,7 @@ class ImageHandler
 
     /**
      * Сборка GIF анимации в единый файл
-     * @param string $destinationPath 
+     * @param string $destinationPath
      */
     public function EncodeGIF($destinationPath)
     {
@@ -123,13 +126,12 @@ class ImageHandler
     
         // Сохраняем готовую анимацию в файл
         $gif->getStream()->copyContentsToFile($destinationPath);
-
     }
     
     /**
-     * 
+     *
      * Изменение размера изображения
-     * 
+     *
      * @param int $width Необходимая ширина изображения, если не указана устанавливается пропорционально новой высоте
      * @param int $height Необходимая высота изображения, если не указана устанавливается пропорционально новой ширине
      * @param bool $isWatermark Проверка на водяной знак
@@ -137,35 +139,27 @@ class ImageHandler
      */
     public function ImageResize($width = 0, $height = 0, $isWatermark = false, $watermark = 0)
     {
-
-        $resizer = function($i=0, $wm = 0, $img = 0) use($width, $height)
-        {
+        $resizer = function ($i=0, $wm = 0, $img = 0) use ($width, $height) {
             // Загружаем кадр
-            if (!$wm)
-                $img = imagecreatefromgif($this->tmpDir . "frame" . str_pad($i, 3 , '0', STR_PAD_LEFT).'.gif');
+            if (!$wm) {
+                $img = imagecreatefromgif($this->tmpDir . "frame" . str_pad($i, 3, '0', STR_PAD_LEFT).'.gif');
+            }
 
             $oldWidth = imagesx($img);
             $oldHeight = imagesy($img);
             
             // Проверяем что пользователь ввел корректные значения
-            if (($width == 0 and $height == 0) or $width < 0 or $height < 0)
-            {
+            if (($width == 0 and $height == 0) or $width < 0 or $height < 0) {
                 throw new Exception("Ошибка. Код -1. Вы ввели некорректные значения ширины и высоты. Изменения не будут внесены.");
-                
-            } elseif ($width == 0)
-            {
+            } elseif ($width == 0) {
                 $newHeight = $height;
                 // Вычисляем ширину пропорциональную новой высоте
-                $newWidth = (int)($oldWidth / ( $oldHeight / $newHeight ));
-
-            } elseif ($height == 0)
-            {
+                $newWidth = (int)($oldWidth / ($oldHeight / $newHeight));
+            } elseif ($height == 0) {
                 $newWidth = $width;
                 // Вычисляем высоту пропорциональную новой ширине
-                $newHeight = (int)($oldHeight / ( $oldWidth / $newWidth ));
-                
-            } else
-            {
+                $newHeight = (int)($oldHeight / ($oldWidth / $newWidth));
+            } else {
                 $newWidth = $width;
                 $newHeight = $height;
             }
@@ -176,39 +170,35 @@ class ImageHandler
             imagecopyresized($newImg, $img, 0, 0, 0, 0, $newWidth, $newHeight, $oldWidth, $oldHeight);
 
             // Сохраняем в файл
-            if (!$wm)
-                imagegif($newImg, $this->tmpDir . "frame" . str_pad($i, 3 , '0', STR_PAD_LEFT).'.gif');
-            else
+            if (!$wm) {
+                imagegif($newImg, $this->tmpDir . "frame" . str_pad($i, 3, '0', STR_PAD_LEFT).'.gif');
+            } else {
                 imagepng($newImg, $this->tmpDir . "wm.png");
+            }
             
             // Удаляем кадры из памяти
             imagedestroy($img);
             imagedestroy($newImg);
         };
 
-        // Проверяем, необходимо ли изменить только водяной знак        
-        if ($isWatermark)
-        {
+        // Проверяем, необходимо ли изменить только водяной знак
+        if ($isWatermark) {
             $resizer(0, $isWatermark, $watermark);
-        }
-        else
-        {
+        } else {
             // Циклично обрабатываем все кадры
             $this->Loop($resizer, " Изменяем размер кадра ");
         }
-        
     }
 
     /**
      * Наложение водяного знака на изображение
-     * 
+     *
      * @param string $watermarkPath Путь до изображения с водяным знаком
      */
     public function PlaceWatermark($watermarkPath)
     {
         // Загружаем изображение водяного знака в соответствии с форматом
-        switch(getimagesize($watermarkPath)["mime"])
-        {
+        switch (getimagesize($watermarkPath)["mime"]) {
             case "image/png":
                 $stamp = imagecreatefrompng($watermarkPath);
                 break;
@@ -239,62 +229,55 @@ class ImageHandler
 
         // Если размер водяного знака по ширине или длине больше чем на 40% от ширины и длины исходного изображения,
         // то уменьшаем его
-        if ($stampX > $this->imgX*0.40 or $stampY > $this->imgY*0.40)
-        {
-            if ($stampX > $this->imgX*0.40)
-            { 
+        if ($stampX > $this->imgX*0.40 or $stampY > $this->imgY*0.40) {
+            if ($stampX > $this->imgX*0.40) {
                 $this->ImageResize((int)($this->imgX*0.40), isWatermark:true, watermark:$stamp);
             }
             $stamp = imagecreatefrompng($this->tmpDir . "wm.png");
             $stampX = imagesx($stamp);
-            $stampY = imagesy($stamp); 
+            $stampY = imagesy($stamp);
 
-            if ($stampY > $this->imgY*0.40)
-            {
+            if ($stampY > $this->imgY*0.40) {
                 $this->ImageResize(height:(int)($this->imgY*0.40), isWatermark:true, watermark:$stamp);
             }
             $stamp = imagecreatefrompng($this->tmpDir . "wm.png");
             $stampX = imagesx($stamp);
-            $stampY = imagesy($stamp); 
-            
+            $stampY = imagesy($stamp);
         }
 
         // Анонимная функция для наложения водяного знака на кадр
-        $watermarker = function($i) use($stamp, $stampX, $stampY, $marge_right, $marge_bottom) 
-        {
+        $watermarker = function ($i) use ($stamp, $stampX, $stampY, $marge_right, $marge_bottom) {
             // Загружаем кадр
-            $frame = imagecreatefromgif($this->tmpDir . "frame" . str_pad($i, 3 , '0', STR_PAD_LEFT).'.gif');
+            $frame = imagecreatefromgif($this->tmpDir . "frame" . str_pad($i, 3, '0', STR_PAD_LEFT).'.gif');
 
             // Получаем размер кадра
             $imgX = imagesx($frame);
             $imgY = imagesy($frame);
 
             // Совмещаем кадр и водяной знак
-            imagecopymerge($frame, $stamp, $imgX - $stampX - $marge_right, $imgY - $stampY - $marge_bottom,0, 0, $stampX, $stampY,60);
+            imagecopymerge($frame, $stamp, $imgX - $stampX - $marge_right, $imgY - $stampY - $marge_bottom, 0, 0, $stampX, $stampY, 60);
             // Сохраняем в файл
-            imagegif($frame, $this->tmpDir . "frame" . str_pad($i, 3 , '0', STR_PAD_LEFT).'.gif');
+            imagegif($frame, $this->tmpDir . "frame" . str_pad($i, 3, '0', STR_PAD_LEFT).'.gif');
             // Выгружаем кадр из памяти
             imagedestroy($frame);
         };
 
         // Циклично обрабатываем все кадры
         $this->Loop($watermarker, " Накладываем водяной знак ");
-            
     }
 
     /**
      * Метод для цикличной обработки анонимных функций
-     * 
+     *
      * @param function $task Анонимная функция
      * @param string $info Подпись прогрессбара
      */
     private function Loop($task, $info)
     {
-        for ($i = 0; $i < $this->numOfFrames; $i++)
-        {
+        for ($i = 0; $i < $this->numOfFrames; $i++) {
             $task($i);
             /**
-             * Progressbar 
+             * Progressbar
              * @author: https://gist.github.com/mayconbordin/2860547
              */
             $perc = round(($i * 100) / $this->numOfFrames);
@@ -303,7 +286,4 @@ class ImageHandler
         }
         echo "\n";
     }
-
 }
-
-?>

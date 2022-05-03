@@ -6,12 +6,10 @@ require __DIR__ . '/ImageHandler.php';
 $width = 0;
 $height = 0;
 
-try
-{
+try {
     $args = arguments($argv);
 
-    if ( $args['help'] )
-    {
+    if ($args['help']) {
         echo "[СПРАВКА]
         giffer [OPTIONS] SRC_FILE DEST_FILE
         где
@@ -26,72 +24,72 @@ try
         Пример:
         giffer --width=640 --height=480 --mark=\"C:\\mark.png\" \"C:\\orig.gif\" \"C:\\result.gif\" 
         ";
-    }
-    elseif ( !$args['options'] or count( $args['options'] ) > 3 or count( $args['arguments'] ) != 2 )
-    {
+    } elseif (!$args['options'] or count($args['options']) > 3 or count($args['arguments']) != 2) {
         throw new Exception("Ошибка: некорректная команда.\nДля вызова справки используйте '-?'");
-    }
-    elseif ( isset( $args['options']['w'], $args['options']['width'] ) or isset( $args['options']['h'], $args['options']['height'] ) or isset( $args['options']['m'], $args['options']['mark'] ) )
-            throw new Exception("Ошибка: введены две одинаковых опции.");
-    else
-    {
-        if ( isset( $args['options']['w']) )
+    } elseif (isset($args['options']['w'], $args['options']['width']) or isset($args['options']['h'], $args['options']['height']) or isset($args['options']['m'], $args['options']['mark'])) {
+        throw new Exception("Ошибка: введены две одинаковых опции.");
+    } else {
+        if (isset($args['options']['w'])) {
             $width = $args['options']['w'];
-        if ( isset( $args['options']['width']) )
+        }
+        if (isset($args['options']['width'])) {
             $width = $args['options']['width'];
+        }
             
-        if ( isset( $args['options']['h']) )
+        if (isset($args['options']['h'])) {
             $height = $args['options']['h'];
-        if ( isset( $args['options']['height']) )
+        }
+        if (isset($args['options']['height'])) {
             $height = $args['options']['height'];
+        }
             
-        if ( isset( $args['options']['m']) )
+        if (isset($args['options']['m'])) {
             $mark = $args['options']['m'];
-        if ( isset( $args['options']['mark']) )
+        }
+        if (isset($args['options']['mark'])) {
             $mark = $args['options']['mark'];
+        }
 
         $src = $args['arguments'][0];
         $dest = $args['arguments'][1];
-        
-    }    
+    }
     
     
     $originalImg = new ImageHandler($src);
     $originalImg->DecodeGIF();
     $originalImg->ImageResize($width, $height);
-    if( $mark ) $originalImg->PlaceWatermark($mark);
+    if ($mark) {
+        $originalImg->PlaceWatermark($mark);
+    }
     $originalImg->EncodeGIF($dest);
 
     echo "Программа завершена с кодом 0";
-}
-catch(Throwable $ex)
-{
+} catch (Throwable $ex) {
     echo "Программа завершена с ошибками -1\n{$ex->getMessage()}";
 }
 
 /**
  * Получение опций и аргументов командной строки
- * 
+ *
  * @param array $_argv Массив аргументов командной строки
  */
-function arguments($_argv) {
+function arguments($_argv)
+{
     $options = [];
-    $args = array 
-    (
+    $args = array(
         'options' => array(),
         'arguments' => array(),
         'help' => false
     );
 
-    foreach($_argv as $arg)
-    {
-        if ( preg_match( '/-{1,2}([^=]+)=(.*)/', $arg, $matches ) ) 
+    foreach ($_argv as $arg) {
+        if (preg_match('/-{1,2}([^=]+)=(.*)/', $arg, $matches)) {
             $args['options'][$matches[1]] = $matches[2];
-        elseif ( substr($arg, -3) == "gif" )
+        } elseif (substr($arg, -3) == "gif") {
             $args['arguments'][] = $arg;
-        elseif ($arg === "-?")
+        } elseif ($arg === "-?") {
             $args['help'] = true;
-
+        }
     }
     return $args;
 }
