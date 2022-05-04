@@ -121,13 +121,13 @@ class ImageHandler
             $gif->addFrame($frame);
             $i++;
         }
-    
+
         $gif->addFooter();
-    
+
         // Сохраняем готовую анимацию в файл
         $gif->getStream()->copyContentsToFile($destinationPath);
     }
-    
+
     /**
      *
      * Изменение размера изображения
@@ -147,7 +147,7 @@ class ImageHandler
 
             $oldWidth = imagesx($img);
             $oldHeight = imagesy($img);
-            
+
             // Проверяем что пользователь ввел корректные значения
             if (($width == 0 and $height == 0) or $width < 0 or $height < 0) {
                 throw new Exception("Ошибка. Код -1. Вы ввели некорректные значения ширины и высоты. Изменения не будут внесены.");
@@ -163,7 +163,7 @@ class ImageHandler
                 $newWidth = $width;
                 $newHeight = $height;
             }
-        
+
             // Создаем холст под изображение с измененными шириной и высотой
             $newImg = imagecreatetruecolor($newWidth, $newHeight);
             // Копируем оригинальное изображение, с изменением ширины и высоты, на полученный холст
@@ -175,7 +175,7 @@ class ImageHandler
             } else {
                 imagepng($newImg, $this->tmpDir . "wm.png");
             }
-            
+
             // Удаляем кадры из памяти
             imagedestroy($img);
             imagedestroy($newImg);
@@ -222,7 +222,7 @@ class ImageHandler
         // Устанавливаем размер отступа
         $marge_right = 10;
         $marge_bottom = 10;
-        
+
         // Получаем размер изображения водяного знака
         $stampX = imagesx($stamp);
         $stampY = imagesy($stamp);
@@ -233,9 +233,7 @@ class ImageHandler
             if ($stampX > $this->imgX*0.40) {
                 $this->ImageResize((int)($this->imgX*0.40), isWatermark:true, watermark:$stamp);
             }
-            $stamp = imagecreatefrompng($this->tmpDir . "wm.png");
-            $stampX = imagesx($stamp);
-            $stampY = imagesy($stamp);
+            list($stampX, $stampY) = getimagesize($this->tmpDir . "wm.png");
 
             if ($stampY > $this->imgY*0.40) {
                 $this->ImageResize(height:(int)($this->imgY*0.40), isWatermark:true, watermark:$stamp);

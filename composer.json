@@ -5,5 +5,8 @@
     },
     "require-dev": {
         "phpstan/phpstan": "^1.6"
+    },
+    "scripts": {
+        "php-cs-fixer": "php-cs-fixer --rules=@PSR2"
     }
 }

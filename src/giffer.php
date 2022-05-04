@@ -35,14 +35,14 @@ try {
         if (isset($args['options']['width'])) {
             $width = $args['options']['width'];
         }
-            
+
         if (isset($args['options']['h'])) {
             $height = $args['options']['h'];
         }
         if (isset($args['options']['height'])) {
             $height = $args['options']['height'];
         }
-            
+
         if (isset($args['options']['m'])) {
             $mark = $args['options']['m'];
         }
@@ -53,8 +53,8 @@ try {
         $src = $args['arguments'][0];
         $dest = $args['arguments'][1];
     }
-    
-    
+
+
     $originalImg = new ImageHandler($src);
     $originalImg->DecodeGIF();
     $originalImg->ImageResize($width, $height);
@@ -93,5 +93,3 @@ function arguments($_argv)
     }
     return $args;
 }
-
-?>
