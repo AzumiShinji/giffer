@@ -50,7 +50,6 @@ try {
             $mark = $args['options']['mark'];
         }
 
-        
         $src = $args['arguments'][0];
         $dest = $args['arguments'][1];
     }
@@ -64,9 +63,10 @@ try {
     }
     $originalImg->EncodeGIF($dest);
 
-    echo "Программа завершена с кодом 0";
+    exit(0);
 } catch (Throwable $ex) {
-    echo "Программа завершена с ошибками -1\n{$ex->getMessage()}";
+    echo "Программа завершена с ошибками\n{$ex->getMessage()}";
+    exit(1);
 }
 
 /**

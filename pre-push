@@ -1,0 +1,33 @@
+#!/bin/sh
+
+if [ -f /vendor/bin/php-cs-fixer ]
+then
+    vendor/bin/php-cs-fixer fix src --rules=@PSR2
+    if [ $? -ne 0 ]
+    then
+        RED='\033[0;31m'
+        CYAN='\033[0;36m'
+        NA='\033[0m'
+ 
+        printf "\n\t${CYAN}[GIT POLICY]${NA} PHP-CS-Fixer has failed - ${RED}Push Aborted${NA}\n\n"
+ 
+        return 1
+    fi
+fi
+
+if [ -f /vendor/bin/php-cs-fixer ]
+then
+    vendor/bin/phpstan analyse src
+    if [ $? -ne 0 ]
+    then
+        RED='\033[0;31m'
+        CYAN='\033[0;36m'
+        NA='\033[0m'
+ 
+        printf "\n\t${CYAN}[GIT POLICY]${NA} PHPStan has failed - ${RED}Push Aborted${NA}\n\n"
+ 
+        return 1
+    fi
+fi
+
+exit 0
