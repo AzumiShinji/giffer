@@ -208,7 +208,6 @@ class ImageHandler
             case "image/jpeg":
                 $stamp = imagecreatefromjpeg($watermarkPath);
                 break;
-                break;
             case "image/bmp":
                 $stamp = imagecreatefrombmp($watermarkPath);
                 break;
@@ -230,12 +229,10 @@ class ImageHandler
         // Если размер водяного знака по ширине или длине больше чем на 40% от ширины и длины исходного изображения,
         // то уменьшаем его
         if ($stampX > $this->imgX*0.40 or $stampY > $this->imgY*0.40) {
-            if ($stampX > $this->imgX*0.40) {
+            if ($stampX > $stampY) {
                 $this->ImageResize((int)($this->imgX*0.40), isWatermark:true, watermark:$stamp);
             }
-            list($stampX, $stampY) = getimagesize($this->tmpDir . "wm.png");
-
-            if ($stampY > $this->imgY*0.40) {
+            else {
                 $this->ImageResize(height:(int)($this->imgY*0.40), isWatermark:true, watermark:$stamp);
             }
             $stamp = imagecreatefrompng($this->tmpDir . "wm.png");
