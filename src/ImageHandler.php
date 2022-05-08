@@ -231,8 +231,7 @@ class ImageHandler
         if ($stampX > $this->imgX*0.40 or $stampY > $this->imgY*0.40) {
             if ($stampX > $stampY) {
                 $this->ImageResize((int)($this->imgX*0.40), isWatermark:true, watermark:$stamp);
-            }
-            else {
+            } else {
                 $this->ImageResize(height:(int)($this->imgY*0.40), isWatermark:true, watermark:$stamp);
             }
             $stamp = imagecreatefrompng($this->tmpDir . "wm.png");

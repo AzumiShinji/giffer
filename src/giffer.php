@@ -25,7 +25,7 @@ try {
         Пример:
         giffer --width=640 --height=480 --mark=\"C:\\mark.png\" \"C:\\orig.gif\" \"C:\\result.gif\" 
         ";
-    } elseif (!$args['options'] or count($args['options']) > 3 or count($args['arguments']) != 2 or empty(array_diff($args['options'], $options))) {
+    } elseif (!$args['options'] or count($args['options']) > 3 or count($args['arguments']) != 2 or array_diff($args['options'], $options)) {
         throw new Exception("Ошибка: некорректная команда.\nДля вызова справки используйте '-?'");
     } elseif (isset($args['options']['w'], $args['options']['width']) or isset($args['options']['h'], $args['options']['height']) or isset($args['options']['m'], $args['options']['mark'])) {
         throw new Exception("Ошибка: введены две одинаковых опции.");
